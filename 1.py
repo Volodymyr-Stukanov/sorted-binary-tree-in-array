@@ -60,29 +60,29 @@ def buildBinaryTree(arr, center: int = None):
 
     tree = []
     currentPow = 1
-    previousIndexes = [center]
+    prePreviousIndexes = [center]
     tree.append(arr[int(center)])
     if center == len(arr)-1:
         tree.append(arr[int(center/2)])
         tree.append(-1)
-        prePreviousIndexes = [int(center/2),-1]
+        previousIndexes = [int(center/2),-1]
     elif  center == 0:
         tree.append(-1)
         tree.append(arr[int((center+len(arr))/2)])
-        prePreviousIndexes = [-1,int((center+len(arr))/2)]
+        previousIndexes = [-1,int((center+len(arr))/2)]
     else:
         tree.append(arr[int(center/2)])
         tree.append(arr[int((center+len(arr))/2)])
-        prePreviousIndexes = [int(center/2),int((center+len(arr))/2)]
+        previousIndexes = [int(center/2),int((center+len(arr))/2)]
     freeCell = -1
     while requiredPow > currentPow:
         temp = []
-        for i in range(len(previousIndexes)):
+        for i in range(len(prePreviousIndexes)):
             for j in range(2):
-                if prePreviousIndexes[i*2+j] == freeCell:
+                if previousIndexes[i*2+j] == freeCell:
                     addElems()
                 else:
-                    ind = prePreviousIndexes[i*2+j]-int(abs(prePreviousIndexes[i*2+j]-previousIndexes[i])/2+0.5)
+                    ind = previousIndexes[i*2+j]-int(abs(previousIndexes[i*2+j]-prePreviousIndexes[i])/2+0.5)
                     if ind < -1:
                         while ind < -1:
                             ind += 1
@@ -91,21 +91,21 @@ def buildBinaryTree(arr, center: int = None):
                         if arr[ind] in tree:
                             if arr[ind+1] in tree:
                                 addElems()
-                            elif arr[ind+1] < prePreviousIndexes[i*2+j]:
+                            elif arr[ind+1] < previousIndexes[i*2+j]:
                                 addElems(ind+1)
                             else:
                                 addElems()
                         else:
                             addElems(ind)
-                    elif ind+1 < prePreviousIndexes[i*2+j] and arr[ind+1] not in tree:
+                    elif ind+1 < previousIndexes[i*2+j] and arr[ind+1] not in tree:
                         addElems(ind+1)
                     else:
                         addElems()
 
-                if prePreviousIndexes[i*2+j] == freeCell:
+                if previousIndexes[i*2+j] == freeCell:
                     addElems()
                 else:
-                    ind = prePreviousIndexes[i*2+j]+int(abs(prePreviousIndexes[i*2+j]-previousIndexes[i])/2+0.5)
+                    ind = previousIndexes[i*2+j]+int(abs(previousIndexes[i*2+j]-prePreviousIndexes[i])/2+0.5)
                     if ind > len(arr):
                         while ind > len(arr):
                             ind -= 1
@@ -114,23 +114,23 @@ def buildBinaryTree(arr, center: int = None):
                         if arr[ind] in tree:
                             if arr[ind-1] in tree:
                                 addElems()
-                            elif arr[ind-1] > prePreviousIndexes[i*2+j]:
+                            elif arr[ind-1] > previousIndexes[i*2+j]:
                                 addElems(ind-1)
                             else:
                                 addElems()
                         else:
                             addElems(ind)
-                    elif ind-1 > prePreviousIndexes[i*2+j] and arr[ind-1] not in tree:
+                    elif ind-1 > previousIndexes[i*2+j] and arr[ind-1] not in tree:
                         addElems(ind-1)
                     else:
                         addElems()
                     
-        previousIndexes.clear()
-        for j in range(len(prePreviousIndexes)):
-            previousIndexes.append(prePreviousIndexes[j])
         prePreviousIndexes.clear()
+        for j in range(len(previousIndexes)):
+            prePreviousIndexes.append(previousIndexes[j])
+        previousIndexes.clear()
         for j in range(len(temp)):
-            prePreviousIndexes.append(temp[j])
+            previousIndexes.append(temp[j])
         currentPow+=1
 
     return tree
@@ -292,14 +292,51 @@ def updateArr():
             arr.append(tree[i])
     return arr
 
+def printTreeLikeTree(tree):
+    pow = 0
+    while 2**pow <= len(tree):
+        pow+=1
+    pow -= 1
+
+    currentPow = 0
+    printedElemsIndexNum = 0
+    toFile = str(tree)+"\n"
+    while currentPow <= pow:
+        print("\n level" + str(currentPow) +"  :",end="")
+        toFile+="\n level" + str(currentPow) +"  :" 
+        for i in range(2**currentPow):
+            if (printedElemsIndexNum+i) == 2**currentPow-1 or (printedElemsIndexNum+i) == 0:
+                for j in range(int(2**pow/2**currentPow)):
+                    toFile+="\t"
+                    print("\t",end="")
+                toFile+=str(tree[printedElemsIndexNum+i])
+                print(tree[printedElemsIndexNum+i],end="")
+            else:
+                for j in range(int(2**pow/2**(currentPow-1))):
+                    toFile+="\t"
+                    print("\t",end="")
+                toFile+=str(tree[printedElemsIndexNum+i])   
+                print(tree[printedElemsIndexNum+i],end="")
+        printedElemsIndexNum+=2**currentPow
+        currentPow+=1
+    return toFile
+
+def writeToFile(toFile):
+    file = open("tree.txt", "a")
+    file.write("\n\n----------------------------------------------------------------------------------------------------\n\n"+toFile)
+    file.close()
+
+toFile = ""
 arr = askAboutArr()
 print(arr)
 center = askAboutCenter()
 tree = buildBinaryTree(arr, center)
 print(tree)
+toFile = printTreeLikeTree(tree)
+writeToFile(toFile)
 
 while True:
-    action = input("\nSelect next action: addition(add), removal(rem), root change(chr), tree rebuild(reb)\n")
+    action = input("\nSelect next action: addition(add), removal(rem), root change(chr), tree rebuild(reb), exit(e)\n")
     if action.lower() == "add":
         addToArr = askAboutArr(arr)
         print(addToArr)
@@ -352,7 +389,11 @@ while True:
     elif action.lower() == "reb":
         print(arr)
         tree = buildBinaryTree(arr)
+    elif action.lower() == "e":
+        break
     else:
-        action = input("\nYou entered an incorrect value. \nSelect next action: addition(add), removal(rem), root change(chr), tree rebuild(reb)\n")
+        action = input("\nYou entered an incorrect value. \nSelect next action: addition(add), removal(rem), root change(chr), tree rebuild(reb), exit(e)\n")
     print(tree)
+    toFile = printTreeLikeTree(tree)
+    writeToFile(toFile)
 

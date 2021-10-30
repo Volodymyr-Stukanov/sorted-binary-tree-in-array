@@ -180,7 +180,7 @@ def checkInterval(quant,arr, max: int,min: int = 0):
 def askAboutArr(currentArr: list = None):
     quant = 0
     while True:
-        quant = input("Enter uantity of tree elements: ")
+        quant = input("Enter quantity of tree elements: ")
         quant, result = tryParseInt(quant)
         if result:
             break
@@ -200,7 +200,7 @@ def askAboutArr(currentArr: list = None):
         min = 0
         max = 0
         while True:
-            min = input("Enter minimal value (must be > -1): ")
+            min = input("Enter minimal value (must be >= 0): ")
             min, result = tryParseInt(min)
             if result:
                 break
@@ -326,74 +326,75 @@ def writeToFile(toFile):
     file.write("\n\n----------------------------------------------------------------------------------------------------\n\n"+toFile)
     file.close()
 
-toFile = ""
-arr = askAboutArr()
-print(arr)
-center = askAboutCenter()
-tree = buildBinaryTree(arr, center)
-print(tree)
-toFile = printTreeLikeTree(tree)
-writeToFile(toFile)
-
-while True:
-    action = input("\nSelect next action: addition(add), removal(rem), root change(chr), tree rebuild(reb), exit(e)\n")
-    if action.lower() == "add":
-        addToArr = askAboutArr(arr)
-        print(addToArr)
-        for i in range(len(addToArr)):
-            arr.append(addToArr[i])
-        print(arr)
-        center = askAboutCenter()
-        tree = buildBinaryTree(arr, center)
-    elif action.lower() == "rem":
-        answer = ""
-        while True:
-            answer = input("Remove one value(1) or the whole branch(2)?\n")
-            if answer == "1" or answer == "2":
-                break
-            else:
-                print("You entered an incorrect value. Enter 1 or 2\n")
-        if answer == "1":
-            value = 0
-            while True:
-                value = input("Enter value for removal: ")
-                value, result = tryParseInt(value)
-                if result:
-                    if value in arr:
-                        break
-                    else:
-                        print("There is no the value in the array")
-                else:
-                    print("There is no the value in the array")
-            arr = deleteValues(arr,value)
-            print(arr)
-            tree = buildBinaryTree(arr)
-        if answer == "2":
-            while True:
-                value = input("Enter value for removal: ")
-                value, result = tryParseInt(value)
-                if result:
-                    if value in arr:
-                        break
-                    else:
-                        print("There is no the value in the array")
-                else:
-                    print("You entered not a integer number. Enter again.")
-            tree = deleteBranch(tree, value)            
-            arr = updateArr()
-
-    elif action.lower() == "chr":        
-        center = askAboutCenter()
-        print(arr)
-        tree = buildBinaryTree(arr, center)
-    elif action.lower() == "reb":
-        print(arr)
-        tree = buildBinaryTree(arr)
-    elif action.lower() == "e":
-        break
-    else:
-        action = input("\nYou entered an incorrect value. \nSelect next action: addition(add), removal(rem), root change(chr), tree rebuild(reb), exit(e)\n")
+if __name__ == "__main__":
+    toFile = ""
+    arr = askAboutArr()
+    print(arr)
+    center = askAboutCenter()
+    tree = buildBinaryTree(arr, center)
     print(tree)
     toFile = printTreeLikeTree(tree)
     writeToFile(toFile)
+
+    while True:
+        action = input("\nSelect next action: addition(add), removal(rem), root change(chr), tree rebuild(reb), exit(e)\n")
+        if action.lower() == "add":
+            addToArr = askAboutArr(arr)
+            print(addToArr)
+            for i in range(len(addToArr)):
+                arr.append(addToArr[i])
+            print(arr)
+            center = askAboutCenter()
+            tree = buildBinaryTree(arr, center)
+        elif action.lower() == "rem":
+            answer = ""
+            while True:
+                answer = input("Remove one value(1) or the whole branch(2)?\n")
+                if answer == "1" or answer == "2":
+                    break
+                else:
+                    print("You entered an incorrect value. Enter 1 or 2\n")
+            if answer == "1":
+                value = 0
+                while True:
+                    value = input("Enter value for removal: ")
+                    value, result = tryParseInt(value)
+                    if result:
+                        if value in arr:
+                            break
+                        else:
+                            print("There is no the value in the array")
+                    else:
+                        print("There is no the value in the array")
+                arr = deleteValues(arr,value)
+                print(arr)
+                tree = buildBinaryTree(arr)
+            if answer == "2":
+                while True:
+                    value = input("Enter value for removal: ")
+                    value, result = tryParseInt(value)
+                    if result:
+                        if value in arr:
+                            break
+                        else:
+                            print("There is no the value in the array")
+                    else:
+                        print("You entered not a integer number. Enter again.")
+                tree = deleteBranch(tree, value)            
+                arr = updateArr()
+
+        elif action.lower() == "chr":        
+            center = askAboutCenter()
+            print(arr)
+            tree = buildBinaryTree(arr, center)
+        elif action.lower() == "reb":
+            print(arr)
+            tree = buildBinaryTree(arr)
+        elif action.lower() == "e":
+            break
+        else:
+            action = input("\nYou entered an incorrect value. \nSelect next action: addition(add), removal(rem), root change(chr), tree rebuild(reb), exit(e)\n")
+        print(tree)
+        toFile = printTreeLikeTree(tree)
+        writeToFile(toFile)
 
